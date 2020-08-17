@@ -1,0 +1,23 @@
+{
+  "name": "discord-bot-client",
+  "version": "0.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/WhippingCream/discord-bot-client.git",
+  "author": "8eatles <8eatles@naver.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon src",
+    "test": "jest"
+  },
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "discord.js": "^12.3.1",
+    "dotenv": "^8.2.0",
+    "moment": "^2.27.0",
+    "morgan": "^1.10.0",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
