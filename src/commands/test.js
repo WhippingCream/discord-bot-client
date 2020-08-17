@@ -1,5 +1,7 @@
+const { getGroupByDiscordGuildId } = require("../apis/groups");
+
 module.exports = {
-  run: () => `테스트`,
+  run: async () => await getGroupByDiscordGuildId("635802085601968158"),
   name: "test",
   aliases: ["테스트"],
   conf: {

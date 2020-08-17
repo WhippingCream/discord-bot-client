@@ -15,7 +15,7 @@ module.exports = {
     prefix: process.env.COMMAND_PREFIX || "/",
   },
   api: {
-    server: "https://camille.locodo.co/api",
+    server: process.env.API_SERVER || "https://camille.locodo.co/api",
   },
   logs: {
     level: process.env.LOG_LEVEL || "silly",

@@ -2,6 +2,8 @@ const echoCmd = require("./echo");
 const versionCmd = require("./version");
 const testCmd = require("./test");
 
+const { getGroupByDiscordGuildId } = require("../apis/groups");
+
 const {
   command: { prefix },
 } = require("../config");
@@ -23,7 +25,7 @@ const regist = ({ run, name, aliases, conf, help }) => {
   });
 };
 
-const load = () => {
+module.exports.load = () => {
   regist(testCmd);
   regist(versionCmd);
   regist(echoCmd);
@@ -43,7 +45,7 @@ const parse = (message) => {
   };
 };
 
-const execute = ({ command, args }) => {
+const execute = async ({ command, args }) => {
   const { run, conf, help } = commandSet[command];
 
   if (!conf.enabled) {
@@ -51,33 +53,28 @@ const execute = ({ command, args }) => {
   }
 
   let groupName;
-  if (conf.requireGroup) {
-    // const group = await models.group.findOne({
-    //   where: { discordGuildId: message.guild.id },
-    // });
-    // groupName = group ? group.groupName : '';
+  // if (conf.requireGroup) {
+  //   // message.guild.id
+  //   const group = await getGroupByDiscordGuildId("635802085601968158");
 
-    groupName = "test";
+  //   groupName = group ? group.groupName : '';
 
-    if (groupName === "") {
-      throw new Error("[Error] 방 등록을 해주세요. 사용법: /방등록 그룹이름");
-    }
-  }
+  //   if (groupName === "") {
+  //     throw new Error("[Error] 방 등록을 해주세요. 사용법: /방등록 그룹이름");
+  //   }
+  // }
 
   try {
-    return run({ args, groupName });
+    const result = await run({ args, groupName });
+    return result;
   } catch (e) {
-    return `${help.usage}\n\t${help.discription}\n\t${e}`;
+    console.log("2");
+    return `${e.message}\n사용법: \`${help.usage}\`\n\t${help.description}`;
   }
 };
 
-const run = (message) => {
+module.exports.run = (message) => {
   const parsed = parse(message);
-
-  return parsed ? execute(parsed) : null;
-};
-
-module.exports = {
-  load,
-  run,
+  const reply = parsed ? execute(parsed) : null;
+  return reply;
 };
