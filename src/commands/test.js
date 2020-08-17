@@ -6,7 +6,7 @@ module.exports = {
   aliases: ["테스트"],
   conf: {
     enabled: true,
-    requireGroup: false,
+    requireGroup: true,
   },
   help: {
     description: "기능테스트 디버그용.",

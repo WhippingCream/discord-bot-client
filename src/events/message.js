@@ -1,5 +1,3 @@
-const { logger } = require("../logger");
-
 const { run } = require("../commands");
 
 const {
@@ -7,23 +5,32 @@ const {
 } = require("../config");
 
 module.exports = async (message) => {
+  const { content, author, channel } = message;
+
+  const {
+    id: channelId,
+    guild: { id: guildId },
+  } = channel;
+
   // filter msg from bot
-  if (message.author.bot) {
+  if (author.bot) {
     return;
   }
 
   // filter not started prefix
-  if (!message.content.startsWith(prefix)) {
+  if (!content.startsWith(prefix)) {
     return;
   }
 
-  try {
-    const output = await run(message);
-    if (output) {
-      message.channel.send(output);
-    }
-  } catch (e) {
-    logger.error(e);
-    return `[Error] ${cmd.help.name} ${e}`;
+  const { result, replyMessage } = await run(content, { channelId, guildId });
+
+  if (result) {
+    message.react("🐾");
+  } else {
+    message.react("🙀");
+  }
+
+  if (replyMessage) {
+    channel.send(replyMessage);
   }
 };

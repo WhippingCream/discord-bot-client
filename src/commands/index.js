@@ -1,3 +1,7 @@
+const { logger } = require("../logger");
+
+const groupsCmd = require("./groups");
+const usersCmd = require("./users");
 const echoCmd = require("./echo");
 const versionCmd = require("./version");
 const testCmd = require("./test");
@@ -25,14 +29,8 @@ const regist = ({ run, name, aliases, conf, help }) => {
   });
 };
 
-module.exports.load = () => {
-  regist(testCmd);
-  regist(versionCmd);
-  regist(echoCmd);
-};
-
-const parse = (message) => {
-  const tokens = message.content.split(" ");
+const parse = (content) => {
+  const tokens = content.split(" ");
   const command = tokens[0].slice(prefix.length);
 
   if (!commandSet[command]) {
@@ -45,36 +43,48 @@ const parse = (message) => {
   };
 };
 
-const execute = async ({ command, args }) => {
+const execute = async ({ command, args }, { guildId }) => {
   const { run, conf, help } = commandSet[command];
 
   if (!conf.enabled) {
     throw new Error(`비활성화된 명령어(${command}) 입니다.`);
   }
 
-  let groupName;
-  // if (conf.requireGroup) {
-  //   // message.guild.id
-  //   const group = await getGroupByDiscordGuildId("635802085601968158");
+  let group = null;
 
-  //   groupName = group ? group.groupName : '';
-
-  //   if (groupName === "") {
-  //     throw new Error("[Error] 방 등록을 해주세요. 사용법: /방등록 그룹이름");
-  //   }
-  // }
+  if (conf.requireGroup) {
+    try {
+      group = await getGroupByDiscordGuildId(guildId);
+    } catch (e) {
+      return {
+        result: false,
+        replyMessage: "방 등록을 해주세요. 사용법: /방등록 그룹이름",
+      };
+    }
+  }
 
   try {
-    const result = await run({ args, groupName });
-    return result;
+    const replyMessage = await run({ args, group });
+    return { result: true, replyMessage };
   } catch (e) {
-    console.log("2");
-    return `${e.message}\n사용법: \`${help.usage}\`\n\t${help.description}`;
+    logger.error(e.message);
+    return {
+      result: false,
+      replyMessage: `사용법: \`${help.usage}\`\n\t${help.description}`,
+    };
   }
 };
 
-module.exports.run = (message) => {
-  const parsed = parse(message);
-  const reply = parsed ? execute(parsed) : null;
+module.exports.load = () => {
+  regist(usersCmd);
+  regist(groupsCmd);
+  regist(testCmd);
+  regist(versionCmd);
+  regist(echoCmd);
+};
+
+module.exports.run = (content, { guildId, channelId }) => {
+  const parsed = parse(content);
+  const reply = parsed ? execute(parsed, { guildId, channelId }) : null;
   return reply;
 };

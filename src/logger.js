@@ -79,7 +79,6 @@ const logger = winston.createLogger({
         default:
           break;
       }
-      // console.log(i);
       return `[${customTimestamp}][${levelColor(level)}] ${messageColor(
         message
       )}`;
